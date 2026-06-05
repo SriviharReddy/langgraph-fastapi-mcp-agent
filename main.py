@@ -14,6 +14,7 @@ from config import settings
 from agent.graph import create_agent
 from api.routes import router as chat_router
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # 1. Setup the connection pool
@@ -21,10 +22,11 @@ async def lifespan(app: FastAPI):
         # 2. Initialize checkpointer using the pool
         checkpointer = AsyncPostgresSaver(pool)
         await checkpointer.setup()
-        
+
         # 3. Store the compiled agent in the main app state
         app.state.agent = await create_agent(checkpointer)
         yield
+
 
 # 3. Create the main app and pass the lifespan handler
 app = FastAPI(lifespan=lifespan)
@@ -35,4 +37,7 @@ app.include_router(chat_router)
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="127.0.0.1", port=8001, reload=True, reload_excludes=["*.log"])
+
+    uvicorn.run(
+        "main:app", host="127.0.0.1", port=8001, reload=True, reload_excludes=["*.log"]
+    )

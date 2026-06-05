@@ -25,14 +25,29 @@ async def stream_chat(
 ) -> AsyncIterator[dict]:
 
     graph: CompiledStateGraph = request.app.state.agent
-    config = {"configurable": {"thread_id": thread_id,}}
-    inputs = {"messages": [{"role": "user","content": message,}]}
-    
+    config = {
+        "configurable": {
+            "thread_id": thread_id,
+        }
+    }
+    inputs = {
+        "messages": [
+            {
+                "role": "user",
+                "content": message,
+            }
+        ]
+    }
+
     yield {
         "event": "meta",
-        "data": json.dumps({"thread_id": thread_id,}),
+        "data": json.dumps(
+            {
+                "thread_id": thread_id,
+            }
+        ),
     }
-    
+
     try:
         async for event in graph.astream_events(
             inputs,
@@ -40,56 +55,71 @@ async def stream_chat(
             version="v2",
         ):
             if await request.is_disconnected():
-                logger.info("Client disconnected (thread=%s)",thread_id)
+                logger.info("Client disconnected (thread=%s)", thread_id)
                 break
 
             match event["event"]:
-
                 case "on_chat_model_stream":
                     chunk = event["data"].get("chunk")
                     if not chunk:
                         continue
                     text = chunk.content
                     if text:
-                        yield {"data": json.dumps({
+                        yield {
+                            "data": json.dumps(
+                                {
                                     "event": "token",
                                     "content": text,
-                                }),}
-                        
+                                }
+                            ),
+                        }
+
                 case "on_tool_start":
                     yield {
-                        "data": json.dumps({
+                        "data": json.dumps(
+                            {
                                 "event": "tool_start",
                                 "tool": event.get("name"),
-                            }),}
+                            }
+                        ),
+                    }
 
                 case "on_tool_end":
                     yield {
-                        "data": json.dumps({
+                        "data": json.dumps(
+                            {
                                 "event": "tool_end",
                                 "tool": event.get("name"),
-                                }),}
+                            }
+                        ),
+                    }
 
                 case _:
                     continue
 
         yield {
-            "data": json.dumps({
+            "data": json.dumps(
+                {
                     "event": "done",
                     "thread_id": thread_id,
-                }),}
-        
+                }
+            ),
+        }
+
     except Exception as exc:
         logger.exception(
             "Chat stream failed (thread=%s)",
             thread_id,
         )
         yield {
-            "data": json.dumps({
+            "data": json.dumps(
+                {
                     "event": "error",
                     "type": exc.__class__.__name__,
                     "detail": str(exc),
-                }),}
+                }
+            ),
+        }
 
 
 @router.post("")

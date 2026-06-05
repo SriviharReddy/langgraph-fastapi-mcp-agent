@@ -5,10 +5,11 @@ from langchain_mcp_adapters.client import MultiServerMCPClient
 # configuration, and a fresh temporary session is created and closed automatically *on each tool call*.
 # No persistent global connections, cache, or shutdown handlers are needed.
 
+
 async def get_mcp_tools():
     """
     Fetches the weather and news tools from the MCP server.
-    
+
     Each tool automatically manages its own session lifecycle when invoked.
     """
     client = MultiServerMCPClient(
