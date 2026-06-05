@@ -22,10 +22,12 @@ class Settings(BaseSettings):
 
     log_level: str = Field(default="INFO")
 
-    deepseek_model = "deepseek-v4-flash" 
-    deepseek_extra_body={"thinking": {"type": "disabled"}}
+    deepseek_model: str = "deepseek-v4-flash"
+    deepseek_extra_body: dict = Field(
+        default_factory=lambda: {"thinking": {"type": "disabled"}}
+    )
 
-    db_url = "postgresql://postgres:postgres@localhost:5442/postgres"
+    db_url: str = "postgresql://postgres:postgres@localhost:5442/postgres"
 
 
 settings = Settings()
