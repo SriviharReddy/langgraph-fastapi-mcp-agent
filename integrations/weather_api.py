@@ -98,8 +98,6 @@ class WeatherData:
             weather_item = weather_data[0]
 
             temp_metric = (weather_item.get("Temperature") or {}).get("Metric") or {}
-            wind = weather_item.get("Wind") or {}
-            wind_speed_metric = (wind.get("Speed") or {}).get("Metric") or {}
 
             return {
                 "location": location,

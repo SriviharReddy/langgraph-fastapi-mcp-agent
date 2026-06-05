@@ -1,6 +1,5 @@
 import httpx
 import json
-import sys
 
 
 def main():
