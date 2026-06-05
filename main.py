@@ -1,4 +1,10 @@
 # main.py
+import sys
+import asyncio
+
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
@@ -22,3 +28,8 @@ app = FastAPI(lifespan=lifespan)
 
 # 4. Include the router
 app.include_router(chat_router)
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="127.0.0.1", port=8001, reload=True)

@@ -9,7 +9,7 @@ from fastmcp.utilities.lifespan import combine_lifespans
 from config import settings
 from utilities.logging import setup_logging
 
-from .tools import info_mcp
+from mcp_server.tools import info_mcp
 
 setup_logging()
 logger = logging.getLogger("mcp.server")
@@ -72,3 +72,9 @@ async def root():
         "health_endpoint": "/health",
         "mcp_endpoint": "/mcp/sse/",
     }
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run("mcp_server.server:app", host="127.0.0.1", port=8000, reload=True)
