@@ -7,6 +7,7 @@ if sys.platform == "win32":
 
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from psycopg_pool import AsyncConnectionPool
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 
 from config import settings
@@ -15,11 +16,13 @@ from api.routes import router as chat_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # 1. Setup the checkpointer
-    async with AsyncPostgresSaver.from_conn_string(settings.db_url) as checkpointer:
+    # 1. Setup the connection pool
+    async with AsyncConnectionPool(settings.db_url) as pool:
+        # 2. Initialize checkpointer using the pool
+        checkpointer = AsyncPostgresSaver(pool)
         await checkpointer.setup()
         
-        # 2. Store the compiled agent in the main app state
+        # 3. Store the compiled agent in the main app state
         app.state.agent = await create_agent(checkpointer)
         yield
 
@@ -32,4 +35,4 @@ app.include_router(chat_router)
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="127.0.0.1", port=8001, reload=True)
+    uvicorn.run("main:app", host="127.0.0.1", port=8001, reload=True, reload_excludes=["*.log"])

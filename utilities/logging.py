@@ -26,5 +26,8 @@ def setup_logging() -> None:
         force=True,  # Clear existing handlers
     )
 
+    # Mute watchfiles logger to prevent infinite logging feedback loop on app.log changes
+    logging.getLogger("watchfiles").setLevel(logging.WARNING)
+
     logger = logging.getLogger("utils.logging")
     logger.info(f"Logging initialized with level: {level_name}")
