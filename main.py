@@ -14,6 +14,9 @@ from config import settings
 from agent.graph import create_agent
 from api.routes import router as chat_router
 
+from middleware.cors import setup_cors
+from middleware.gzip import setup_gzip
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -30,6 +33,9 @@ async def lifespan(app: FastAPI):
 
 # 3. Create the main app and pass the lifespan handler
 app = FastAPI(lifespan=lifespan)
+
+setup_cors(app)
+setup_gzip(app)
 
 # 4. Include the router
 app.include_router(chat_router)

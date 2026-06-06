@@ -29,5 +29,7 @@ class Settings(BaseSettings):
 
     db_url: str = "postgresql://postgres:postgres@localhost:5442/postgres"
 
+    api_key: Optional[str] = Field(default="dev-secret-key-12345")
+
 
 settings = Settings()
